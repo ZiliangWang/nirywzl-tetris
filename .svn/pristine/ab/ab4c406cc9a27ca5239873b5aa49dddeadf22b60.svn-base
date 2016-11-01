@@ -1,0 +1,196 @@
+package view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
+import model.Board;
+/**
+ * 
+ * @author Ziliang Wang
+ * @version 12/1/2015
+ */
+public class MenuBar extends JMenuBar implements Observer {
+    /** */
+    private static final long serialVersionUID = -111659266189879540L;
+    /** */
+    private static final String GAME_OVER = "The Game Over!";
+    /** */
+    private boolean myGameOver;
+    /** The timer field.*/
+    private final Timer myTimer;
+    /** The frame field.*/
+    private final JFrame myFrame;
+    /** The game board field. */
+    private final Board myBoard;
+    /** */
+    private final TetrisDrawingPanel myTPanel;
+    /** The start button. */
+    private final JMenuItem myStart = new JMenuItem("Start New Game");
+    /** The pause button.*/
+    private final JMenuItem myPause = new JMenuItem("Pause");
+    /** The resume button.*/
+    private final JMenuItem myResume = new JMenuItem("Resume");
+    /** The end button.*/
+    private final JMenuItem myEnd = new JMenuItem("End Game");
+    /**
+     * 
+     * @param theT 
+     * @param theFrame 
+     * @param theBoard 
+     * @param thePanel 
+     */
+    public MenuBar(final Timer theT, final JFrame theFrame, 
+                   final Board theBoard, final TetrisDrawingPanel thePanel) {
+        super();
+        myTimer = theT;
+        myFrame = theFrame;
+        myBoard = theBoard;
+        myTPanel = thePanel;
+        myBoard.addObserver(this);
+        add(mainMenu());
+        add(optionMenu());
+        add(setHelp());
+    }
+    /**
+     * 
+     * @return 123
+     */
+    private JMenu optionMenu() {
+        final JMenu option = new JMenu("Option");
+        final JCheckBoxMenuItem grid = new JCheckBoxMenuItem("Grid");
+        grid.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) { 
+                myTPanel.enableGrid(grid.getState());
+                myTPanel.repaint();
+            }
+        });
+        option.add(grid);
+        return option;
+    }
+    /**
+     * This would constructor main menu.
+     * @return a option menu.
+     */
+    private JMenu mainMenu() {
+        final JMenu main = new JMenu("Menu");
+
+
+        final JMenuItem exit = new JMenuItem("Exit");
+        
+        myStart.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myBoard.newGame(TetrisGUI.BOARD_WIDTH, TetrisGUI.BOARD_HEIGHT, null);
+                myGameOver = false;
+                myTimer.start();
+                myEnd.setEnabled(true);
+                myPause.setEnabled(true);
+                myStart.setEnabled(false);
+            }
+            
+        });
+        main.add(myStart);
+        
+        myPause.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myTimer.stop();
+                myGameOver = true;
+                myResume.setEnabled(true);
+                myPause.setEnabled(false);
+            }
+        });
+        myPause.setEnabled(false);
+        main.add(myPause);
+        
+        myResume.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myTimer.start();
+                myPause.setEnabled(true);
+                myResume.setEnabled(false);
+            }
+        });
+        myResume.setEnabled(false);
+        main.add(myResume);
+        
+        myEnd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myTimer.stop();
+                myGameOver = true;
+                myStart.setEnabled(true);
+                myPause.setEnabled(false);
+                myResume.setEnabled(false);
+                myEnd.setEnabled(false);
+                JOptionPane.showMessageDialog(myFrame, GAME_OVER);
+            }
+        });
+        myEnd.setEnabled(false);
+        main.add(myEnd);
+        
+        main.addSeparator();
+        
+        exit.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myFrame.dispose();
+            }
+            
+        });
+        main.add(exit);
+        
+        return main;
+    }
+    /**
+     * 
+     * @return a boolean value that tells game over.
+     */
+    public boolean gameIsOver() {
+        return myGameOver;
+    }
+    
+    /**
+     * Set up the help JMenu.
+     * @return a help menu.
+     */
+    private JMenu setHelp() {
+        final JMenu help = new JMenu("Help"); 
+        help.setMnemonic(KeyEvent.VK_H);
+        final JMenuItem about = new JMenuItem("About...");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showMessageDialog(null, "TCSS 305 Tetris, Autumn, 2015");
+            }
+        });
+        help.add(about);
+        return help;
+    }
+    
+    @Override
+    public void update(final Observable theO, final Object theArg) {
+        if (myBoard.isGameOver()) {
+            myTimer.stop();
+            myStart.setEnabled(true);
+            myPause.setEnabled(false);
+            myResume.setEnabled(false);
+            myEnd.setEnabled(false);
+            JOptionPane.showMessageDialog(myFrame, GAME_OVER);
+        }
+    }
+}

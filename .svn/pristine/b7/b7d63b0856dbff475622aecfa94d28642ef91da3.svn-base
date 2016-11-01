@@ -1,0 +1,165 @@
+package view;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import model.AbstractPiece;
+import model.Block;
+import model.Board;
+/**
+ * This class is used for drawing the gaming process.
+ * @author Ziliang Wang
+ * @version 12/1/2015
+ */
+public class TetrisDrawingPanel extends JPanel implements Observer {
+    /** Serial ID number.*/
+    private static final long serialVersionUID = 2692442711727254916L;
+    /** The size of block.*/
+    private static final int BLOCK_SIZE = 30;
+    /** The amount of blocks.*/
+    private static final int BLOCKS_NUM = 4;
+    /** Level change percent.*/
+    private static final double LEVEL_PERCENT = 0.05;
+    /** Coordinates list for blocks.*/
+    private int [][] myPieceCoord; 
+    /** The fronzen block size check.*/
+    private int myFSize;
+    /** The level size.*/
+    private int myLevelSize;
+    /** The board field.*/
+    private final Board myBoard;
+    /** The information panel field.*/
+    private final ScorePanel myScorePanel;
+    /** The timer field.*/
+    private final Timer myTimer;
+    /** The boolean to active grid.*/
+    private boolean myGrid;
+    /**
+     * This is the constructor that would initialize the fields.
+     * @param theBoard the board that passed by GUI.
+     * @param theScorePanel the information panel.
+     * @param theTimer main timer for the game.
+     */
+    public TetrisDrawingPanel(final Board theBoard, final ScorePanel theScorePanel,
+                              final Timer theTimer) {
+        super();
+        myBoard = theBoard;
+        myScorePanel = theScorePanel;
+        myTimer = theTimer;
+        myFSize = myBoard.getFrozenBlocks().size();
+        myBoard.addObserver(this);
+        myPieceCoord = new int [BLOCKS_NUM][2];
+        myPieceCoord = ((AbstractPiece) myBoard.getCurrentPiece()).getBoardCoordinates();
+        setUpJPanel();
+    }
+    /**
+     * Set up the JPanel for Drawing.
+     */
+    private void setUpJPanel() {
+        setPreferredSize(new Dimension(
+                 myBoard.getWidth() * BLOCK_SIZE, 
+                 myBoard.getHeight() * BLOCK_SIZE));
+        setBackground(Color.WHITE);
+    }
+    
+    @Override
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(2));
+        drawCurrentRect(g2d);
+        drawFrozenBlock(g2d);
+        if (myGrid) {
+            g2d.setColor(Color.GRAY);
+            g2d.setStroke(new BasicStroke(1));
+            for (int i = 0; i <= this.getHeight(); i += BLOCK_SIZE) {
+                g2d.draw(new Line2D.Double(0, i, this.getWidth(), i));
+                for (int j = 0; j <= this.getWidth(); j += BLOCK_SIZE) {
+                    g2d.draw(new Line2D.Double(j, 0, j, this.getHeight()));
+                }
+            }
+        }
+    }
+    
+    /**
+     * This would draw current piece that board has.
+     * @param thePen graphics tool.
+     */
+   
+    private void drawCurrentRect(final Graphics2D thePen) {
+        for (int i = 0; i < BLOCKS_NUM; i++) {
+            thePen.setColor(Color.LIGHT_GRAY);
+            thePen.fillRect(myPieceCoord[i][0] * BLOCK_SIZE, 
+                            this.getHeight() - myPieceCoord[i][1] * BLOCK_SIZE - BLOCK_SIZE, 
+                         BLOCK_SIZE, BLOCK_SIZE);
+            thePen.setColor(Color.CYAN);
+            thePen.drawRect(myPieceCoord[i][0] * BLOCK_SIZE, 
+                            this.getHeight() - myPieceCoord[i][1] * BLOCK_SIZE - BLOCK_SIZE, 
+                         BLOCK_SIZE, BLOCK_SIZE);
+        }
+    }
+    
+    /**
+     * This would draw the frozen blocks.
+     * @param thePen graphics tool.
+     */
+   
+    private void drawFrozenBlock(final Graphics2D thePen) {
+        for (int i = 0; i < myBoard.getFrozenBlocks().size(); i++) {
+
+            for (int j = 0; j < myBoard.getWidth(); j++) {
+                if (myBoard.getFrozenBlocks().get(i)[j] != Block.EMPTY) {
+
+                    thePen.setColor(Color.BLUE);
+                    thePen.fillRect(j * BLOCK_SIZE, 
+                                    this.getHeight() - i * BLOCK_SIZE - BLOCK_SIZE, 
+                                    BLOCK_SIZE, BLOCK_SIZE);
+                    thePen.setColor(Color.GREEN);
+                    thePen.drawRect(j * BLOCK_SIZE, 
+                                    this.getHeight() - i * BLOCK_SIZE - BLOCK_SIZE, 
+                                    BLOCK_SIZE, BLOCK_SIZE);
+                }
+            }
+        }
+    }
+    
+    /**
+     * This is enabling for grid boolean value.
+     * @param theGrid the boolean value of grid.
+     */ 
+    public void enableGrid(final boolean theGrid) {
+        myGrid = theGrid;
+    }
+    
+    @Override
+    public void update(final Observable theO, final Object theArg) {
+        myPieceCoord = ((AbstractPiece) myBoard.getCurrentPiece()).getBoardCoordinates();
+        if (myFSize > myBoard.getFrozenBlocks().size()) {
+            myScorePanel.increaseMyScore();
+            myFSize = myBoard.getFrozenBlocks().size();
+        } else {
+            myFSize = myBoard.getFrozenBlocks().size();
+        }
+        myLevelSize = myScorePanel.getMyLevel();
+        if (myLevelSize != 1) {
+            increaseTheLevel();
+        }   
+        repaint();
+    }
+    /**
+     * Change the timer speed.
+     */
+    private void increaseTheLevel() {
+        myTimer.setDelay((int) (myTimer.getDelay()
+                        - myTimer.getDelay() * (LEVEL_PERCENT * myLevelSize)));
+    }
+}

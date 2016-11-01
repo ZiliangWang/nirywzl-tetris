@@ -1,0 +1,42 @@
+package view;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import javax.swing.JPanel;
+/**
+ * 
+ * @author Ziliang Wang
+ * @version 12/8/2015
+ */
+public class InfoPanel extends JPanel {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4691417946172572337L;
+    /** my text area panel size. */
+    private static final Dimension TA_SIZE = new Dimension(200, 300);
+    /** Font size. */
+    private static final int FONT_SIZE = 15;
+    /**
+     * 
+     */
+    public InfoPanel() {
+        super();
+        setUpPanel();
+    }
+    /**
+     * 
+     */
+    private void setUpPanel() {
+        setBackground(Color.LIGHT_GRAY);
+    }
+    
+    @Override
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+    }
+}

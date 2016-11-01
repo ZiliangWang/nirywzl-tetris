@@ -1,0 +1,77 @@
+/**
+ * 
+ */
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.JPanel;
+
+/**
+ * @author Ziliang Wang
+ * @version 12/2/2015
+ */
+public class MainPanel extends JPanel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7526370675764013626L;
+    /** my main panel size. */
+    private static final Dimension MAIN_SIZE = new Dimension(200, 600);
+    /** my introduction panel size. */
+    private static final Dimension INTRO_SIZE = new Dimension(300, 150);
+    /** The next piece panel field.*/
+    private final JPanel myNPPanel;
+    /** The information panel field.*/
+    private final JPanel myInfoPanel;
+    /** The introduction panel field.*/
+    private final JPanel myIntroPanel;
+    /**
+     * This is the constructor and initialize the fields.
+     * @param theNPPanel the next piece panel.
+     */
+    public MainPanel(final JPanel theNPPanel) {
+        super();
+        myInfoPanel = new JPanel();
+        myIntroPanel = new JPanel();
+        myNPPanel = theNPPanel;
+        
+        setUpThePanel();
+    }
+    /**
+     * This would give a panel has information.
+     * @return return info panel
+     */
+    private JPanel setTheInfoPanel() {
+        return myInfoPanel;
+    }
+    /**
+     * This will construct a panel that contains instruction.
+     * @return an introduction panel.
+     */
+    private JPanel insertIntro() {
+//        final JTextArea ta = new JTextArea();
+//        ta.setText("Introduction of Tetris \n");
+//        ta.append("Left Arrow: move left;\nRight Arrow: move right \n");
+//        ta.append("Up Arrow: rotate;\nDown Arrow: move down \n");
+//        ta.append("Space: hard drop \n");
+//        ta.setSize(TA_SIZE);
+//        ta.setFont(new Font("Serif", Font.PLAIN, FONT_SIZE));
+//        ta.setLineWrap(true);
+//        ta.setWrapStyleWord(true);
+//        ta.setEditable(false);
+//        myIntroPanel.add(ta);
+        myIntroPanel.setPreferredSize(INTRO_SIZE);
+        return myIntroPanel;
+    }
+    /**
+     * This would set up the main panel.
+     */
+    private void setUpThePanel() {
+        setLayout(new BorderLayout());
+        add(myNPPanel, BorderLayout.NORTH);
+        add(setTheInfoPanel(), BorderLayout.CENTER);
+        add(insertIntro(), BorderLayout.SOUTH);
+        setPreferredSize(MAIN_SIZE);
+    }
+}

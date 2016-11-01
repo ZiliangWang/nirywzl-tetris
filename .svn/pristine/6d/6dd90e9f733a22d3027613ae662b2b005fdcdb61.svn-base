@@ -1,0 +1,22 @@
+/**
+ * 
+ */
+package view;
+
+/**
+ * @author Ziliang Wang
+ * @version 11/30/2015
+ */
+public final class TetrisMain {
+    /** */
+    private TetrisMain() {
+        //do nothing
+    }
+    /**
+     * @param theArgs 
+     */
+    public static void main(final String[] theArgs) {
+        new TetrisGUI();
+    }
+
+}
